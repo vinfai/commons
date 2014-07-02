@@ -1,0 +1,45 @@
+异常监控接入指南
+
+一般可以将监控加在web模块上
+
+1. 加入 mvn 依赖
+	dependencyManagement中
+	<commons.monitor.version>0.0.1-SNAPSHOT</commons.monitor.version>
+	<dependency>
+					<groupId>com.shengpay.commons.monitor</groupId>
+					<artifactId>commons-monitor</artifactId>
+					<version>${commons.monitor.version}</version>
+					<type>jar</type>
+					<scope>compile</scope>
+	</dependency>
+	
+	<dependency>
+		<groupId>com.shengpay.commons.monitor</groupId>
+		<artifactId>commons-monitor</artifactId>
+	</dependency>
+
+2. 复制 exception_monitor_sample.properties 到src/main/resources/META-INF, 
+	改名为  exception_monitor.properties
+	并按照自己的模块修改
+
+3. 增加异常监控jms jndi, 可参考 queue_jndi_context_sample.xml
+	unit test jms jndi可参考 ac_exception_monitor_jndi_test_sample.xml
+	
+4. 把 bean config添加到web.xml 的   contextConfigLocation中
+	classpath:/META-INF/ac_commons_monitor.xml
+
+5. 如果需要log 监控到的异常，可以在log4j中加入, 请替换${webmodule.log.dir}
+	<appender name="LOG.Exception.Monitor" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${webmodule.log.dir}/commons-monitor.log"/>
+        <param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+        <param name="append" value="false"/>
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+        	<param name="ConversionPattern" value="[%d] [%-5p] %c{2} - %m%n" />
+        </layout>
+    </appender>
+    <logger name="com.shengpay.commons.monitor" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="LOG.Exception.Monitor" />
+	</logger>
+

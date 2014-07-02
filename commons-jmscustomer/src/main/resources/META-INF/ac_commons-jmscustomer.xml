@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http-conf="http://cxf.apache.org/transports/http/configuration" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	   http://www.springframework.org/schema/util 
+	   http://www.springframework.org/schema/util/spring-util-3.0.xsd
+	   http://www.springframework.org/schema/context 
+	   http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+	   http://www.springframework.org/schema/tx
+	   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	   http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+	   http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd 
+	   http://www.springframework.org/schema/aop 
+	   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.shengpay.commons.jmscustomer" />
+	
+	<!-- 
+	<bean id="logOutAspect_dao" class="com.shengpay.commons.springtools.aspectj.LogOutAspect" />
+	<aop:config>
+		<aop:aspect ref="logOutAspect_dao">
+			<aop:around method="logout" pointcut="execution(* com.shengpay.commons.jmscustomer.**..*.*(..))" />
+		</aop:aspect>
+	</aop:config>	
+	 -->
+
+	<bean id="ppc_active_PropertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+	      		<value>file:/opt/pay/config/commons/jmscustomer/jmscustomer.property</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 1，定义JMS代理工厂公共配置 -->
+	<bean id="jmsConnect" class="com.shengpay.commons.jmsproxy.jmsconnect.JmsConnect">
+		<constructor-arg value="java:comp/env/jms/jmsConnectionFactory"/>
+		<constructor-arg value="java:comp/env/jms/queue/email"/>
+	</bean>
+
+	<!-- 2，定义消息消费者
+	<bean id="msgListener" class="com.shengpay.commons.jmsproxy.msglistener.MsgListener">
+		<constructor-arg ref="emailSenderImpl"/>
+		<constructor-arg ref="jmsConnect"/>
+	</bean>
+	 -->
+
+</beans>

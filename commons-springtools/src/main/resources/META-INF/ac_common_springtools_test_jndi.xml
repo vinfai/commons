@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<beans>
+	<alias name="transactionManager_database" alias="transactionManager"/>
+	
+	<bean id="jndiContext" class=" com.shengpay.commons.springtools.base.JndiContextMock" init-method="init">
+		<property name="contextMap">
+			<map>
+				<!-- 
+				<entry key="java:comp/env/jdbc/DataSource">
+					<bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+						<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+						<property name="url" value="jdbc:oracle:thin:@221.231.134.83:1521:creditcard"></property>
+						<property name="username" value="transbutton_ci"></property>
+						<property name="password" value="ebctest"></property>
+						<property name="initialSize" value="5" />
+						<property name="maxActive" value="15" />
+						<property name="maxIdle" value="15" />
+						<property name="maxWait" value="1000" />
+					</bean>
+				</entry>
+				 -->
+				<entry key="java:comp/env/jms/NormalConnectionFactory">
+					<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+						<property name="brokerURL" value="failover:(tcp://10.241.10.30:61616)?initialReconnectDelay=100&amp;maxReconnectAttempts=5" />
+						<property name="userName" value="sdouser"></property>
+						<property name="password" value="sdouser"></property>
+						<property name="prefetchPolicy">
+							<bean class="org.apache.activemq.ActiveMQPrefetchPolicy">
+								<property name="queuePrefetch" value="1" />
+							</bean>
+						</property>
+						<property name="redeliveryPolicy">
+							<bean class="org.apache.activemq.RedeliveryPolicy">
+								<property name="initialRedeliveryDelay" value="1000" />
+								<property name="maximumRedeliveries" value="10" />
+								<property name="useExponentialBackOff" value="false" />
+							</bean>
+						</property>
+					</bean>
+				</entry>
+				<entry key="java:comp/env/jms/queue/MyQueue">
+					<bean class="org.apache.activemq.command.ActiveMQDestination" factory-method="createDestination" scope="prototype">
+						<constructor-arg value="JMS.TRANSBUTTON.INTERFACE_PROXY"></constructor-arg>
+						<constructor-arg value="1"></constructor-arg>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>
+

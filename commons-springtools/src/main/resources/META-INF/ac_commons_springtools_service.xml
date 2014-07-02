@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="logOutAOP_commons" class="com.shengpay.commons.springtools.aop.LogOutAOP"></bean>
+
+	<!-- JMS代理工厂 -->
+	<bean id="jmsProxyFactory_commons"
+		class="com.shengpay.commons.springtools.proxy.jms.JmsProxyFactory"
+		init-method="init" destroy-method="drop" abstract="true">
+		<property name="interceptorNames">
+			<list>
+				<!--
+					<value>exceptionMonitorAOP_commons</value>
+					<value>transactionRetryAOP_commons</value>
+				-->
+				<value>logOutAOP_commons</value>
+			</list>
+		</property>
+		<property name="proxyPackagePrefix">
+			<list>
+				<value>com.sdo.transbutton</value>
+			</list>
+		</property>
+		<property name="connectionFactoryJndi" value="java:comp/env/jms/NormalConnectionFactory" />
+		<property name="destinationJndi" value="java:comp/env/jms/queue/MyQueue" />
+	</bean>
+
+	<bean id="jmsProxyFactoryTest_commons" parent="jmsProxyFactory_commons">
+		<property name="targerObject">
+			<bean class="com.shengpay.commons.springtools.proxy.jms.JmsTestServiceImpl"></bean>
+		</property>
+	</bean>
+
+	<bean id="testFacadeInterface"
+		class="com.shengpay.commons.springtools.proxy.facade.FacadeProxyFactory">
+		<property name="proxyInterface"
+			value="com.shengpay.commons.springtools.proxy.facade.FacadeInterface"></property>
+		<property name="targets">
+			<list>
+				<bean class="com.shengpay.commons.springtools.proxy.facade.Interface1Impl"></bean>
+				<bean class="com.shengpay.commons.springtools.proxy.facade.Interface2Impl"></bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 日志输出代理 -->
+	<bean id="logOutProxy_commons" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="interceptorNames">
+			<list>
+				<value>logOutAOP_commons</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>

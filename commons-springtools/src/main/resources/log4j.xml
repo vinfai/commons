@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	
+	<!-- 
+	<appender name="WEB-LOG" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/mypay/log/commons.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p %d %c - %m%n" />
+		</layout>
+	</appender>
+	 -->
+	 
+	<appender name="WEB-LOG" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p %d %c:%L - %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="com.sdo.transbutton" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="WEB-LOG" />
+	</logger>
+
+	<logger name="org.springframework" additivity="false">
+		<level value="WARN" />
+		<appender-ref ref="WEB-LOG" />
+	</logger>
+
+	<logger name="java.sql" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="WEB-LOG" />
+	</logger>
+	
+	<logger name="org.apache.activemq" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="LOG.Console" />
+	</logger>
+	
+	<root>
+		<level value="info" />
+		<appender-ref ref="WEB-LOG" />
+	</root>
+</log4j:configuration>
+

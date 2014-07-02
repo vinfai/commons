@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	   http://www.springframework.org/schema/context 
+	   http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+	   http://www.springframework.org/schema/tx
+	   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	   http://www.springframework.org/schema/aop 
+	   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	   
+	<aop:aspectj-autoproxy />
+<!--
+	<context:property-placeholder location="classpath:/META-INF/exception_monitor.properties"/>
+-->
+	<bean class="com.shengpay.commons.monitor.aspect.ExceptionMonitorAspect" />
+	
+	<bean id="exceptionHandlerServiceImpl_monitor" class="com.shengpay.commons.monitor.handler.ExceptionHandlerServiceImpl">
+		<property name="moduleName" value="${exception.monitor.module.name}"></property>
+		<property name="monitorSwitch" value="${exception.monitor.switch.monitor}"></property>
+		<property name="sendEmailSwitch" value="${exception.monitor.switch.sendemail}"></property>
+		<property name="sendSmsSwitch" value="${exception.monitor.switch.sendsms}"></property>
+		<property name="sdoMonitorSwitch" value="${exception.monitor.switch.sdo}"></property>
+		
+		<property name="notifyMpArr">
+			<value>${exception.monitor.sms.mobiles}</value>
+		</property>
+		<property name="fromEmail">
+			<value>${exception.monitor.email.from}</value>
+		</property>
+		<property name="toEmails">
+			<value>${exception.monitor.email.tos}</value>
+		</property>
+		<property name="exceptionList">
+			<bean class="com.shengpay.commons.core.collection.RestrictLengthList">
+				<constructor-arg value="${exception.monitor.exceptionlist.length}"></constructor-arg>
+			</bean>
+		</property>
+		<property name="smsMaxLength" value="${exception.monitor.sms.maxlength}"></property>
+		
+	</bean>
+	
+	<bean id="sdoExceptionMonitor_monitor" class="com.shengpay.commons.monitor.sdomonitor.SdoExceptionMonitor">
+		<property name="notifyUrl" value="${exception.monitor.sdo.notifyurl}"/>
+		<property name="defaultType" value="${exception.monitor.sdo.defaulttype}"/>   <!--一般 -->
+		<property name="exceptionMappings">
+			<map>
+			    <entry key="com.shengpay.commons.core.exception.ManualMeddleException" value="${exception.monitor.sdo.exception.biztype}"/> <!--警告 -->
+			    <entry key="com.shengpay.commons.core.exception.BusinessException" value="67452023"/> <!--警告 -->
+			    <entry key="com.shengpay.commons.core.exception.CheckException" value="${exception.monitor.sdo.exception.checktype}"/> <!--一般 -->
+			    <entry key="com.shengpay.commons.core.exception.SystemException" value="${exception.monitor.sdo.exception.systype}"/> <!--致命 -->
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="smsSender_monitor" parent="jmsProxyFactory_monitor">
+		<property name="targetInterface" value="com.sdo.transbutton.common.sms.SmsSender"></property>
+	</bean>
+
+	<bean id="emailSender_monitor" parent="jmsProxyFactory_monitor">
+		<property name="targetInterface" value="com.sdo.transbutton.common.email.EmailSender"></property>
+	</bean>
+	
+	<bean id="jmsProxyFactory_monitor" class="com.sdo.transbutton.common.proxyfactroy.JmsProxyFactory" init-method="init" destroy-method="drop" abstract="true">
+		<property name="proxyPackagePrefix">
+			<list>
+				<value>com</value>
+			</list>
+		</property>
+		<property name="connectionFactory">
+			<bean class="org.springframework.jndi.JndiObjectFactoryBean">
+				<property name="jndiName">
+					<value>java:comp/env/jms/Connection_Exception_Monitor</value>
+				</property>
+			</bean>
+		</property>
+		<property name="destination">
+			<bean class="org.springframework.jndi.JndiObjectFactoryBean">
+				<property name="jndiName">
+					<value>java:comp/env/jms/queue/Queue_Exception_Monitor</value>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+</beans>

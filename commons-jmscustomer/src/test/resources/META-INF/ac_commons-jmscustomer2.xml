@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="gbk"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<beans>
+	<bean id="jmsProxyFactory_commons" class="com.shengpay.commons.springtools.proxy.jms.JmsProxyFactory" abstract="true">
+		<property name="connectionFactoryJndi" value="java:comp/env/jms/jmsConnectionFactory" />
+		<property name="destinationJndi" value="java:comp/env/jms/queue/email" />
+	</bean>
+	<bean id="BgwService" parent="jmsProxyFactory_commons">
+		<property name="targetInterface" value="com.shengpay.commons.core.email.EmailSender" />
+	</bean>
+</beans>
+

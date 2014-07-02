@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="gbk"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+
+<beans>
+	<bean id="jndiContext" class="com.shengpay.commons.springtools.base.JndiContextMock" init-method="init">
+		<property name="contextMap">
+			<map>
+				<entry key="java:comp/env/jms/jmsConnectionFactory">
+					<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+						<property name="brokerURL" value="failover:(tcp://10.132.97.90:61636)?jms.useAsyncSend=true" />
+						<property name="userName" value="system"></property>
+						<property name="password" value="manager"></property>
+						<property name="prefetchPolicy">
+							<bean class="org.apache.activemq.ActiveMQPrefetchPolicy">
+								<property name="queuePrefetch" value="1" />
+							</bean>
+						</property>
+						<property name="redeliveryPolicy">
+							<bean class="org.apache.activemq.RedeliveryPolicy">
+								<property name="initialRedeliveryDelay" value="1000" />
+								<property name="maximumRedeliveries" value="10" />
+								<property name="useExponentialBackOff" value="false" />
+							</bean>
+						</property>
+					</bean>
+				</entry>
+				<entry key="java:comp/env/jms/queue/email">
+					<bean class="org.apache.activemq.command.ActiveMQDestination" factory-method="createDestination" scope="prototype">
+						<constructor-arg value="JMS.INTERFACE_PROXY.commons.email"></constructor-arg>
+						<constructor-arg value="1"></constructor-arg>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="emailSender" class="com.shengpay.commons.jmsproxy.interfaceproxy.InterfaceProxy">
+		<constructor-arg value="com.shengpay.commons.core.email.EmailSender" />
+		<constructor-arg>
+			<bean class="com.shengpay.commons.jmsproxy.jmsconnect.JmsConnect">
+				<constructor-arg value="java:comp/env/jms/jmsConnectionFactory" />
+				<constructor-arg value="java:comp/env/jms/queue/email" />
+			</bean>
+		</constructor-arg>
+	</bean>
+
+</beans>
+
